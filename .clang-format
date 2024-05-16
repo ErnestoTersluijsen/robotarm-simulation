@@ -1,0 +1,7 @@
+BasedOnStyle: Microsoft
+ColumnLimit: '500'
+Language: Cpp
+PointerAlignment: Left
+TabWidth: '4'
+UseTab: Always
+IndentCaseLabels: true
