@@ -44,4 +44,5 @@ void RobotarmSimulation::update_robotarm()
 {
 	msg_.header.stamp = get_clock()->now();
 
+	publisher_->publish(msg_);
 }
