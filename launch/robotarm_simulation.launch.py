@@ -9,8 +9,9 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     robotarm_sim_path = FindPackageShare('robotarm_simulation')
-    default_model_path = PathJoinSubstitution(['urdf', 'lynxmotion_arm.urdf'])
+    default_robotarm_model_path = PathJoinSubstitution(['urdf', 'lynxmotion_arm.urdf'])
     default_rviz_config_path = PathJoinSubstitution([robotarm_sim_path, 'rviz', 'urdf_config.rviz'])
+    default_mug_model_path = PathJoinSubstitution([robotarm_sim_path, 'urdf', 'mug.urdf'])
 
     # These parameters are maintained for backwards compatibility
     gui_arg = DeclareLaunchArgument(name='gui', default_value='true', choices=['true', 'false'],
@@ -21,7 +22,7 @@ def generate_launch_description():
     ld.add_action(rviz_arg)
 
     # This parameter has changed its meaning slightly from previous versions
-    ld.add_action(DeclareLaunchArgument(name='model', default_value=default_model_path,
+    ld.add_action(DeclareLaunchArgument(name='model', default_value=default_robotarm_model_path,
                                         description='Path to robot urdf file relative to urdf_tutorial package'))
 
     ld.add_action(IncludeLaunchDescription(
