@@ -15,6 +15,8 @@ class RobotarmSimulation : public rclcpp::Node
 
 	void update_robotarm();
 
+	double pwm_to_radians(long pwm);
+
 	rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 
 	rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publisher_;
@@ -22,6 +24,11 @@ class RobotarmSimulation : public rclcpp::Node
 	rclcpp::TimerBase::SharedPtr timer_;
 
 	sensor_msgs::msg::JointState msg_;
+
+	std::vector<double> positions = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	std::vector<double> steps = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+	unsigned long min_moving_time;
 };
 
 #endif // ROBOTARM_SIMULATION_ROBOTARM_SIMULATION_HPP
