@@ -6,39 +6,50 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    ld = LaunchDescription()
+	ld = LaunchDescription()
 
-    robotarm_sim_path = FindPackageShare('robotarm_simulation')
-    default_robotarm_model_path = PathJoinSubstitution(['urdf', 'lynxmotion_arm.urdf'])
-    default_rviz_config_path = PathJoinSubstitution([robotarm_sim_path, 'rviz', 'urdf_config.rviz'])
-    default_mug_model_path = PathJoinSubstitution([robotarm_sim_path, 'urdf', 'mug.urdf'])
+	robotarm_sim_path = FindPackageShare('robotarm_simulation')
+	default_robotarm_model_path = PathJoinSubstitution(['urdf', 'lynxmotion_arm.urdf'])
+	default_mug_model_path = PathJoinSubstitution(['urdf', 'mug.urdf'])
+	default_rviz_config_path = PathJoinSubstitution([robotarm_sim_path, 'rviz', 'urdf_config.rviz'])
 
-    # These parameters are maintained for backwards compatibility
-    gui_arg = DeclareLaunchArgument(name='gui', default_value='true', choices=['true', 'false'],
-                                    description='Flag to enable joint_state_publisher_gui')
-    ld.add_action(gui_arg)
-    rviz_arg = DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
-                                     description='Absolute path to rviz config file')
-    ld.add_action(rviz_arg)
+	ld.add_action(DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
+									 description='Absolute path to rviz config file'))
 
-    # This parameter has changed its meaning slightly from previous versions
-    ld.add_action(DeclareLaunchArgument(name='model', default_value=default_robotarm_model_path,
-                                        description='Path to robot urdf file relative to urdf_tutorial package'))
+	ld.add_action(DeclareLaunchArgument(name='robotarm_model', default_value=default_robotarm_model_path,
+										description='Path to robot urdf file relative to urdf_tutorial package'))
 
-    ld.add_action(IncludeLaunchDescription(
-        PathJoinSubstitution([FindPackageShare('urdf_launch'), 'launch', 'display.launch.py']),
-        launch_arguments={
-            'urdf_package': 'robotarm_simulation',
-            'urdf_package_path': LaunchConfiguration('model'),
-            'rviz_config': LaunchConfiguration('rvizconfig'),
-            'jsp_gui': LaunchConfiguration('gui')}.items()
-    ))
+	ld.add_action(DeclareLaunchArgument(name='mug_model', default_value=default_mug_model_path,
+										description='Path to robot urdf file relative to urdf_tutorial package'))
 
-    # ld.add_action(Node(
-    # 	    package="robotarm_simulation",
-    #     	executable="robotarm_simulation",
-    #         parameters=[]
-	# 	)
-    # )
 
-    return ld
+	ld.add_action(Node(
+		package='robot_state_publisher',
+		executable='robot_state_publisher',
+		name='robot_state_publisher_robotarm',
+		output='screen',
+		arguments=[LaunchConfiguration('robotarm_model')]
+	))
+
+	# ld.add_action(Node(
+	# 	package='robot_state_publisher',
+	# 	executable='robot_state_publisher',
+	# 	name='robot_state_publisher_mug',
+	# 	output='screen',
+	# 	arguments=[LaunchConfiguration('mug_model')]
+	# ))
+	
+	ld.add_action(Node(
+		package='rviz2',
+		executable='rviz2',
+		name='rviz2',
+		output='screen',
+		arguments=['-d', LaunchConfiguration('rvizconfig')]
+	))
+
+	ld.add_action(Node(
+		package='robotarm_simulation',
+		executable='robotarm_simulation'
+	))
+
+	return ld
