@@ -9,8 +9,8 @@ def generate_launch_description():
 	ld = LaunchDescription()
 
 	robotarm_sim_path = FindPackageShare('robotarm_simulation')
-	default_robotarm_model_path = PathJoinSubstitution(['urdf', 'lynxmotion_arm.urdf'])
-	default_mug_model_path = PathJoinSubstitution(['urdf', 'mug.urdf'])
+	default_robotarm_model_path = PathJoinSubstitution([robotarm_sim_path, 'urdf', 'lynxmotion_arm.urdf'])
+	default_mug_model_path = PathJoinSubstitution([robotarm_sim_path, 'urdf', 'mug.urdf'])
 	default_rviz_config_path = PathJoinSubstitution([robotarm_sim_path, 'rviz', 'urdf_config.rviz'])
 
 	ld.add_action(DeclareLaunchArgument(name='rvizconfig', default_value=default_rviz_config_path,
