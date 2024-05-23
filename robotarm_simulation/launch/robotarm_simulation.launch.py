@@ -31,13 +31,14 @@ def generate_launch_description():
 		arguments=[LaunchConfiguration('robotarm_model')]
 	))
 
-	# ld.add_action(Node(
-	# 	package='robot_state_publisher',
-	# 	executable='robot_state_publisher',
-	# 	name='robot_state_publisher_mug',
-	# 	output='screen',
-	# 	arguments=[LaunchConfiguration('mug_model')]
-	# ))
+	ld.add_action(Node(
+		package='robot_state_publisher',
+		executable='robot_state_publisher',
+		name='robot_state_publisher_mug',
+		output='screen',
+		arguments=[LaunchConfiguration('mug_model')],
+		remappings=[('/robot_description', '/mug_robot_description')]
+	))
 	
 	ld.add_action(Node(
 		package='rviz2',
