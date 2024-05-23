@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <robot name="lynxmotion_arm">
 	<link name="base_link">
 		<visual>

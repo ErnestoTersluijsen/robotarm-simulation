@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /RobotModel1/Links1
+        - /RobotModel2/Links1
         - /TF1
       Splitter Ratio: 0.5
     Tree Height: 557
@@ -29,6 +30,17 @@ Visualization Manager:
         Value: /robot_description
       Enabled: true
       Name: RobotModel
+      Visual Enabled: true
+    - Alpha: 0.6
+      Class: rviz_default_plugins/RobotModel
+      Description Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /mug_robot_description
+      Enabled: true
+      Name: MugModel
       Visual Enabled: true
     - Class: rviz_default_plugins/TF
       Enabled: true
