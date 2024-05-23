@@ -15,7 +15,7 @@ RobotarmSimulation::RobotarmSimulation() : Node("robotarm_simulation"), min_movi
 	timer_ = this->create_wall_timer(std::chrono::milliseconds(1000 / 100), std::bind(&RobotarmSimulation::update_robotarm, this));
 
 	msg_.header.stamp = get_clock()->now();
-	msg_.name = {"base_link2turret", "turret2upperarm", "upperarm2forearm", "forearm2wrist", "wrist2hand", "gripper_left2hand", "gripper_right2hand"};
+	msg_.name = { "base_link2turret", "turret2upperarm", "upperarm2forearm", "forearm2wrist", "wrist2hand", "gripper_left2hand", "gripper_right2hand" };
 	msg_.position = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 }
 
@@ -41,7 +41,6 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 			}
 
 			steps.at(std::stoul(matches.str(1))) = (positions.at(std::stoul(matches.str(1))) - msg_.position.at(std::stoul(matches.str(1)))) / (time / 10);
-
 		}
 		catch (const std::exception& e)
 		{
