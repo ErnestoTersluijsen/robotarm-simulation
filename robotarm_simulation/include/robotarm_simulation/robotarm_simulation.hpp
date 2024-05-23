@@ -17,6 +17,8 @@ class RobotarmSimulation : public rclcpp::Node
 
 	double pwm_to_radians(long pwm);
 
+	double pwm_to_meters(long pwm);
+
 	rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;
 
 	rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publisher_;

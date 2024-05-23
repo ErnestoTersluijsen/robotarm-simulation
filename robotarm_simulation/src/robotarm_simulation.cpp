@@ -31,9 +31,17 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 			unsigned long time = std::stoul(matches.str(3));
 			time = std::max(time, min_moving_time);
 
-			// TODO: ADD CHECKS FOR SERVO ID 5 & 6 AND BEHAVE DIFFERENTLY
-			positions.at(std::stoul(matches.str(1))) = pwm_to_radians(std::stoul(matches.str(2)));
-			steps.at(std::stoul(matches.str(1))) = (positions.at(std::stoul(matches.str(1))) - msg_.position.at(std::stoul(matches.str(1)))) / (std::stoul(matches.str(3)) / 10);
+			if (std::stoul(matches.str(1)) < 4)
+			{
+				positions.at(std::stoul(matches.str(1))) = pwm_to_radians(std::stoul(matches.str(2)));
+			}
+			else
+			{
+				positions.at(std::stoul(matches.str(1))) = pwm_to_meters(std::stoul(matches.str(2)));
+			}
+
+			steps.at(std::stoul(matches.str(1))) = (positions.at(std::stoul(matches.str(1))) - msg_.position.at(std::stoul(matches.str(1)))) / (time / 10);
+
 		}
 		catch (const std::exception& e)
 		{
@@ -65,4 +73,12 @@ double RobotarmSimulation::pwm_to_radians(long pwm)
 	constexpr double radians_max = 90 * (M_PI / 180);
 
 	return (pwm - 500) * (radians_max - radians_min) / (2500 - 500) + radians_min;
+}
+
+double RobotarmSimulation::pwm_to_meters(long pwm)
+{
+	constexpr double meters_min = 0.015;
+	constexpr double meters_max = -0.015;
+
+	return (pwm - 500) * (meters_max - meters_min) / (2500 - 500) + meters_min;
 }
