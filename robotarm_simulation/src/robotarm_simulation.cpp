@@ -28,19 +28,24 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 	{
 		try
 		{
+			unsigned long servo_id = std::stoul(matches.str(1));
+			unsigned long pwm = std::stoul(matches.str(2));
 			unsigned long time = std::stoul(matches.str(3));
 			time = std::max(time, min_moving_time);
 
-			if (std::stoul(matches.str(1)) < 4)
+			if (servo_id < 5)
 			{
-				positions.at(std::stoul(matches.str(1))) = pwm_to_radians(std::stoul(matches.str(2)));
+				positions.at(servo_id) = pwm_to_radians(pwm);
+				steps.at(servo_id) = (positions.at(servo_id) - msg_.position.at(servo_id)) / (time / 10);
 			}
-			else
+			else if (std::stoul(matches.str(1)) == 5)
 			{
-				positions.at(std::stoul(matches.str(1))) = pwm_to_meters(std::stoul(matches.str(2)));
-			}
+				positions.at(servo_id) = pwm_to_meters(pwm);
+				steps.at(servo_id) = (positions.at(servo_id) - msg_.position.at(servo_id)) / (time / 10);
 
-			steps.at(std::stoul(matches.str(1))) = (positions.at(std::stoul(matches.str(1))) - msg_.position.at(std::stoul(matches.str(1)))) / (time / 10);
+				positions.at(servo_id + 1) = pwm_to_meters(pwm);
+				steps.at(servo_id + 1) = (positions.at(servo_id + 1) - msg_.position.at(servo_id + 1)) / (time / 10);
+			}
 		}
 		catch (const std::exception& e)
 		{
