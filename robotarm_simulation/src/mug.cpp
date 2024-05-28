@@ -21,14 +21,12 @@ void Mug::update_mug()
 	geometry_msgs::msg::TransformStamped hand;
 	geometry_msgs::msg::TransformStamped gripper_left;
 	geometry_msgs::msg::TransformStamped gripper_right;
-	geometry_msgs::msg::TransformStamped mug;
 
 	try
 	{
 		hand = tf_buffer_->lookupTransform("base_link", "hand", tf2::TimePointZero);
 		gripper_left = tf_buffer_->lookupTransform("base_link", "gripper_left", tf2::TimePointZero);
 		gripper_right = tf_buffer_->lookupTransform("base_link", "gripper_right", tf2::TimePointZero);
-    	mug = tf_buffer_->lookupTransform("base_link", "mug_link", tf2::TimePointZero);
 	}
 	catch (const std::exception& e)
 	{
@@ -37,15 +35,26 @@ void Mug::update_mug()
 
 	double left_gripper_distance = calculate_distance(msg_.transform.translation, gripper_left.transform.translation);
 	double right_gripper_distance = calculate_distance(msg_.transform.translation, gripper_right.transform.translation);
-	if (left_gripper_distance <= 0.01 && right_gripper_distance <= 0.01) // TODO: CHANGE THESE VALUES
+	// RCLCPP_INFO(this->get_logger(), "Mug Position - x: %f, y: %f, z: %f",
+	// 			msg_.transform.translation.x,
+	// 			msg_.transform.translation.y,
+	// 			msg_.transform.translation.z);
+	// RCLCPP_INFO(this->get_logger(), "Left Gripper: %f, Right Gripper: %f: ", left_gripper_distance, right_gripper_distance);
+
+	if (left_gripper_distance <= 0.1 && right_gripper_distance <= 0.1) // TODO: CHANGE THESE VALUES
 	{
+
 		std::cout << "in the gripper" << std::endl;
 		// msg_.transform.translation;
+		msg_.transform.translation.z = 3;
 		// TODO: SAVE PREVIOUS HAND POS
 		// TODO: ADD (CURRENT_HAND_POS - PREV_HAND_POS) TO MUG TO DO MOVEMENT
+	} else if(left_gripper_distance >= 0.1 && right_gripper_distance >= 0.1 && msg_.transform.translation.z > 0){
+		//TODO: The Mug has to fall onto the ground (msg_.transform.translation.z - heavy weights)
 	}
 
 	// TODO: ADD GRAVITY
+
 
 	msg_.header.stamp = get_clock()->now();
 	msg_.header.frame_id = "base_link";
