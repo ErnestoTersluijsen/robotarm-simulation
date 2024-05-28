@@ -13,17 +13,19 @@ find_package(tf2_ros REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
-add_executable(${PROJECT_NAME}
-	src/main.cpp
+# =========================================== robotarm ============================================
+
+add_executable(robotarm
+	src/robotarm_main.cpp
 	src/robotarm_simulation.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(robotarm PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 	$<INSTALL_INTERFACE:include>
 )
 
-ament_target_dependencies(${PROJECT_NAME}
+ament_target_dependencies(robotarm
 	rclcpp
 	tf2
 	tf2_ros
@@ -32,8 +34,35 @@ ament_target_dependencies(${PROJECT_NAME}
 )
 
 install(TARGETS
-	${PROJECT_NAME}
-    DESTINATION lib/${PROJECT_NAME})
+	robotarm
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+# ============================================= mug ===============================================
+
+add_executable(mug
+	src/mug_main.cpp
+	src/mug.cpp
+)
+
+target_include_directories(mug PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	$<INSTALL_INTERFACE:include>
+)
+
+ament_target_dependencies(mug
+	rclcpp
+	tf2
+	tf2_ros
+	geometry_msgs
+)
+
+install(TARGETS
+	mug
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+# ============================================= rviz ==============================================
 
 install(
   DIRECTORY launch rviz urdf

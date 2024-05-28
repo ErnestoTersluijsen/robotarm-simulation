@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot name="mug">
-	<link name="base_link">
+	<link name="mug_link">
 		<visual>
 			<geometry>
 				<cylinder length="0.04" radius="0.02"/>

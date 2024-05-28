@@ -28,10 +28,16 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 	{
 		try
 		{
+			const unsigned long MAX_PWM = 2500;
+			const unsigned long MIN_PWM = 500;
+
 			unsigned long servo_id = std::stoul(matches.str(1));
 			unsigned long pwm = std::stoul(matches.str(2));
 			unsigned long time = std::stoul(matches.str(3));
 			time = std::max(time, min_moving_time);
+
+			pwm = std::min(pwm, MAX_PWM);
+			pwm = std::max(pwm, MIN_PWM);
 
 			if (servo_id < 5)
 			{
@@ -75,14 +81,18 @@ double RobotarmSimulation::pwm_to_radians(long pwm)
 	// constexpr allows the compiler to do these calculations at compile time instead of doing this calculation at runtime
 	constexpr double radians_min = -90 * (M_PI / 180);
 	constexpr double radians_max = 90 * (M_PI / 180);
+	constexpr double min_pwm = 500;
+	constexpr double max_pwm = 2500;
 
-	return (pwm - 500) * (radians_max - radians_min) / (2500 - 500) + radians_min;
+	return (pwm - min_pwm) * (radians_max - radians_min) / (max_pwm - min_pwm) + radians_min;
 }
 
 double RobotarmSimulation::pwm_to_meters(long pwm)
 {
 	constexpr double meters_min = 0.015;
 	constexpr double meters_max = -0.015;
+	constexpr double min_pwm = 500;
+	constexpr double max_pwm = 2500;
 
-	return (pwm - 500) * (meters_max - meters_min) / (2500 - 500) + meters_min;
+	return (pwm - min_pwm) * (meters_max - meters_min) / (max_pwm - min_pwm) + meters_min;
 }

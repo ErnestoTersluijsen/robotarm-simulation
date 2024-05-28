@@ -50,7 +50,13 @@ def generate_launch_description():
 
 	ld.add_action(Node(
 		package='robotarm_simulation',
-		executable='robotarm_simulation'
+		executable='robotarm'
 	))
+
+	# ld.add_action(Node(
+	# 	package='robotarm_simulation',
+	# 	executable='mug',
+	# 	parameters=[{'x': 0.35, 'y': 0.0, 'z': 0.0}]
+	# ))
 
 	return ld
