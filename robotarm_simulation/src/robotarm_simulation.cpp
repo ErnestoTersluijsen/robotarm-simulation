@@ -40,11 +40,11 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 			}
 			else if (std::stoul(matches.str(1)) == 5)
 			{
-				positions.at(servo_id) = pwm_to_meters(pwm);
-				steps.at(servo_id) = (positions.at(servo_id) - msg_.position.at(servo_id)) / (time / 10);
-
-				positions.at(servo_id + 1) = pwm_to_meters(pwm);
-				steps.at(servo_id + 1) = (positions.at(servo_id + 1) - msg_.position.at(servo_id + 1)) / (time / 10);
+				for (int i = 0; i < 2; ++i)
+				{
+					positions.at(servo_id + i) = pwm_to_meters(pwm);
+					steps.at(servo_id + i) = (positions.at(servo_id + i) - msg_.position.at(servo_id + i)) / (time / 10);
+				}
 			}
 		}
 		catch (const std::exception& e)
