@@ -21,12 +21,14 @@ void Mug::update_mug()
 	geometry_msgs::msg::TransformStamped hand;
 	geometry_msgs::msg::TransformStamped gripper_left;
 	geometry_msgs::msg::TransformStamped gripper_right;
+	geometry_msgs::msg::TransformStamped mug;
 
 	try
 	{
 		hand = tf_buffer_->lookupTransform("base_link", "hand", tf2::TimePointZero);
 		gripper_left = tf_buffer_->lookupTransform("base_link", "gripper_left", tf2::TimePointZero);
 		gripper_right = tf_buffer_->lookupTransform("base_link", "gripper_right", tf2::TimePointZero);
+    	mug = tf_buffer_->lookupTransform("base_link", "mug_link", tf2::TimePointZero);
 	}
 	catch (const std::exception& e)
 	{
@@ -35,7 +37,6 @@ void Mug::update_mug()
 
 	double left_gripper_distance = calculate_distance(msg_.transform.translation, gripper_left.transform.translation);
 	double right_gripper_distance = calculate_distance(msg_.transform.translation, gripper_right.transform.translation);
-
 	if (left_gripper_distance <= 0.01 && right_gripper_distance <= 0.01) // TODO: CHANGE THESE VALUES
 	{
 		std::cout << "in the gripper" << std::endl;

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<!-- <?xml version="1.0"?>
 <robot name="mug">
 	<link name="mug_link">
 		<visual>
@@ -8,4 +8,21 @@
 			<origin xyz="0 0 0.02" rpy="0 0 0" />
 		</visual>
 	</link>
+</robot> -->
+<?xml version="1.0"?>
+<robot name="mug">
+    <link name="base_link"/>
+    <link name="mug_link">
+        <visual>
+            <geometry>
+                <cylinder length="0.04" radius="0.02"/>
+            </geometry>
+            <origin xyz="0 0 0.02" rpy="0 0 0"/>
+        </visual>
+    </link>
+    <joint name="base_to_mug" type="fixed">
+        <parent link="base_link"/>
+        <child link="mug_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
 </robot>
