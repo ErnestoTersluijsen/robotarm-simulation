@@ -14,6 +14,9 @@ Mug::Mug() : Node("mug"), update_interval(10), current_velocity(0)
 	msg_.transform.translation.x = this->declare_parameter<double>("x", 0.35);
 	msg_.transform.translation.y = this->declare_parameter<double>("y", 0);
 	msg_.transform.translation.z = this->declare_parameter<double>("z", 0);
+	previous_hand_.transform.translation.x = 0;
+	previous_hand_.transform.translation.y = 0;
+	previous_hand_.transform.translation.z = 0;
 }
 
 void Mug::update_mug()
@@ -39,8 +42,17 @@ void Mug::update_mug()
 	// TODO: DELETE LATER
 	RCLCPP_INFO_STREAM(this->get_logger(), "left gripper distance: " << left_gripper_distance);
 	RCLCPP_INFO_STREAM(this->get_logger(), "right gripper distance: " << right_gripper_distance);
+	RCLCPP_INFO_STREAM(this->get_logger(), "x hand: " << previous_hand_.transform.translation.x);
+	RCLCPP_INFO_STREAM(this->get_logger(), "y hand: " << previous_hand_.transform.translation.y);
+	RCLCPP_INFO_STREAM(this->get_logger(), "z hand: " << previous_hand_.transform.translation.z);
+	RCLCPP_INFO_STREAM(this->get_logger(), "x mug: " << msg_.transform.translation.x);
+	RCLCPP_INFO_STREAM(this->get_logger(), "y mug: " << msg_.transform.translation.y);
+	RCLCPP_INFO_STREAM(this->get_logger(), "z mug: " << msg_.transform.translation.z);
+	RCLCPP_INFO_STREAM(this->get_logger(), "x mugMove: " << (hand.transform.translation.x - previous_hand_.transform.translation.x));
+	RCLCPP_INFO_STREAM(this->get_logger(), "y mugMove: " << (hand.transform.translation.y - previous_hand_.transform.translation.y));
+	RCLCPP_INFO_STREAM(this->get_logger(), "z mugMove: " << (hand.transform.translation.z - previous_hand_.transform.translation.z));
 
-	if (left_gripper_distance <= 0.1 && right_gripper_distance <= 0.1) // TODO: CHANGE THESE VALUES ~0.03 or lower
+	if (left_gripper_distance <= 0.03 && right_gripper_distance <= 0.03) // TODO: CHANGE THESE VALUES ~0.03 or lower
 	{
 		current_velocity = 0;
 		std::cout << "in the gripper" << std::endl;
@@ -48,8 +60,11 @@ void Mug::update_mug()
 		// msg_.transform.translation.z = 3;
 		// TODO: SAVE PREVIOUS HAND POS
 		// TODO: ADD (CURRENT_HAND_POS - PREV_HAND_POS) TO MUG TO DO MOVEMENT
+		msg_.transform.translation.x += (hand.transform.translation.x - previous_hand_.transform.translation.x);
+		msg_.transform.translation.y += (hand.transform.translation.y - previous_hand_.transform.translation.y);
+		msg_.transform.translation.z += (hand.transform.translation.z - previous_hand_.transform.translation.z);
 	}
-	else if (msg_.transform.translation.z > 0)
+	else if (msg_.transform.translation.z != 0)
 	{
 		update_gravity();
 	}
@@ -57,6 +72,9 @@ void Mug::update_mug()
 	{
 		current_velocity = 0;
 	}
+	previous_hand_.transform.translation.x = hand.transform.translation.x;
+	previous_hand_.transform.translation.y = hand.transform.translation.y;
+	previous_hand_.transform.translation.z = hand.transform.translation.z;
 
 	msg_.header.stamp = get_clock()->now();
 	msg_.header.frame_id = "base_link";

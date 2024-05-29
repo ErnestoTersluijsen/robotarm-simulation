@@ -30,6 +30,8 @@ class Mug : public rclcpp::Node
 
 	std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
+	geometry_msgs::msg::TransformStamped previous_hand_;
+
 	unsigned long update_interval;
 
 	double current_velocity;
