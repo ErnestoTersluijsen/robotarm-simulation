@@ -31,6 +31,8 @@ class RobotarmSimulation : public rclcpp::Node
 	std::vector<double> steps = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
 	unsigned long min_moving_time;
+
+	unsigned long update_interval;
 };
 
 #endif // ROBOTARM_SIMULATION_ROBOTARM_SIMULATION_HPP

@@ -2,9 +2,9 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-Mug::Mug() : Node("mug")
+Mug::Mug() : Node("mug"), update_interval(10), current_velocity(0)
 {
-	timer_ = this->create_wall_timer(std::chrono::milliseconds(1000 / 100), std::bind(&Mug::update_mug, this));
+	timer_ = this->create_wall_timer(std::chrono::milliseconds(update_interval), std::bind(&Mug::update_mug, this));
 
 	tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
@@ -35,27 +35,28 @@ void Mug::update_mug()
 
 	double left_gripper_distance = calculate_distance(msg_.transform.translation, gripper_left.transform.translation);
 	double right_gripper_distance = calculate_distance(msg_.transform.translation, gripper_right.transform.translation);
-	// RCLCPP_INFO(this->get_logger(), "Mug Position - x: %f, y: %f, z: %f",
-	// 			msg_.transform.translation.x,
-	// 			msg_.transform.translation.y,
-	// 			msg_.transform.translation.z);
-	// RCLCPP_INFO(this->get_logger(), "Left Gripper: %f, Right Gripper: %f: ", left_gripper_distance, right_gripper_distance);
-	double distance_mug_and_robot = calculate_distance(gripper_left.transform.translation, msg_.transform.translation);
-	RCLCPP_INFO(this->get_logger(), "Distance mug and robot: %f", distance_mug_and_robot);
-	if (left_gripper_distance <= 0.1 && right_gripper_distance <= 0.1 && distance_mug_and_robot < 0.05) // TODO: CHANGE THESE VALUES
-	{
 
+	// TODO: DELETE LATER
+	RCLCPP_INFO_STREAM(this->get_logger(), "left gripper distance: " << left_gripper_distance);
+	RCLCPP_INFO_STREAM(this->get_logger(), "right gripper distance: " << right_gripper_distance);
+
+	if (left_gripper_distance <= 0.1 && right_gripper_distance <= 0.1) // TODO: CHANGE THESE VALUES ~0.03 or lower
+	{
+		current_velocity = 0;
 		std::cout << "in the gripper" << std::endl;
 		// msg_.transform.translation;
 		// msg_.transform.translation.z = 3;
 		// TODO: SAVE PREVIOUS HAND POS
 		// TODO: ADD (CURRENT_HAND_POS - PREV_HAND_POS) TO MUG TO DO MOVEMENT
-	} else if(left_gripper_distance >= 0.1 && right_gripper_distance >= 0.1 && msg_.transform.translation.z > 0){
-		//TODO: The Mug has to fall onto the ground (msg_.transform.translation.z - heavy weights)
 	}
-
-	// TODO: ADD GRAVITY
-
+	else if (msg_.transform.translation.z > 0)
+	{
+		update_gravity();
+	}
+	else
+	{
+		current_velocity = 0;
+	}
 
 	msg_.header.stamp = get_clock()->now();
 	msg_.header.frame_id = "base_link";
@@ -64,16 +65,18 @@ void Mug::update_mug()
 	tf_broadcaster_->sendTransform(msg_);
 }
 
-void Mug::mug_fall()
+void Mug::update_gravity()
 {
-	if(msg_.transform.translation.z <= 0)
+	const double gravitational_acceleration = 9.81;
+	const double time = static_cast<double>(update_interval) / 1000;
+
+	current_velocity -= gravitational_acceleration * time;
+	msg_.transform.translation.z += current_velocity * time;
+
+	if (msg_.transform.translation.z < 0)
 	{
 		msg_.transform.translation.z = 0;
-	} else 
-	{
-		msg_.transform.translation.z -= 0.1;
 	}
-
 }
 
 double Mug::calculate_distance(const geometry_msgs::msg::Vector3& p1, const geometry_msgs::msg::Vector3& p2) const

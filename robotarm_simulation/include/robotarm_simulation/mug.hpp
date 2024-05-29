@@ -18,6 +18,8 @@ class Mug : public rclcpp::Node
 
 	double calculate_distance(const geometry_msgs::msg::Vector3& p1, const geometry_msgs::msg::Vector3& p2) const;
 
+	void update_gravity();
+
 	rclcpp::TimerBase::SharedPtr timer_;
 
 	std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
@@ -27,6 +29,10 @@ class Mug : public rclcpp::Node
 	std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
 	std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
+
+	unsigned long update_interval;
+
+	double current_velocity;
 };
 
 #endif // ROBOTARM_SIMULATION_MUG_HPP

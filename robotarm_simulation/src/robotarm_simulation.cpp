@@ -6,13 +6,13 @@
 #include <regex>
 #include <string>
 
-RobotarmSimulation::RobotarmSimulation() : Node("robotarm_simulation"), min_moving_time(1000)
+RobotarmSimulation::RobotarmSimulation() : Node("robotarm_simulation"), min_moving_time(1000), update_interval(10)
 {
 	subscription_ = this->create_subscription<std_msgs::msg::String>("commands", 10, std::bind(&RobotarmSimulation::parse_command, this, std::placeholders::_1));
 
 	publisher_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
 
-	timer_ = this->create_wall_timer(std::chrono::milliseconds(1000 / 100), std::bind(&RobotarmSimulation::update_robotarm, this));
+	timer_ = this->create_wall_timer(std::chrono::milliseconds(update_interval), std::bind(&RobotarmSimulation::update_robotarm, this));
 
 	msg_.header.stamp = get_clock()->now();
 	msg_.name = { "base_link2turret", "turret2upperarm", "upperarm2forearm", "forearm2wrist", "wrist2hand", "gripper_left2hand", "gripper_right2hand" };
