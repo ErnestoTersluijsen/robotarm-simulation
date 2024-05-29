@@ -40,13 +40,14 @@ void Mug::update_mug()
 	// 			msg_.transform.translation.y,
 	// 			msg_.transform.translation.z);
 	// RCLCPP_INFO(this->get_logger(), "Left Gripper: %f, Right Gripper: %f: ", left_gripper_distance, right_gripper_distance);
-
-	if (left_gripper_distance <= 0.1 && right_gripper_distance <= 0.1) // TODO: CHANGE THESE VALUES
+	double distance_mug_and_robot = calculate_distance(gripper_left.transform.translation, msg_.transform.translation);
+	RCLCPP_INFO(this->get_logger(), "Distance mug and robot: %f", distance_mug_and_robot);
+	if (left_gripper_distance <= 0.1 && right_gripper_distance <= 0.1 && distance_mug_and_robot < 0.05) // TODO: CHANGE THESE VALUES
 	{
 
 		std::cout << "in the gripper" << std::endl;
 		// msg_.transform.translation;
-		msg_.transform.translation.z = 3;
+		// msg_.transform.translation.z = 3;
 		// TODO: SAVE PREVIOUS HAND POS
 		// TODO: ADD (CURRENT_HAND_POS - PREV_HAND_POS) TO MUG TO DO MOVEMENT
 	} else if(left_gripper_distance >= 0.1 && right_gripper_distance >= 0.1 && msg_.transform.translation.z > 0){
@@ -61,6 +62,18 @@ void Mug::update_mug()
 	msg_.child_frame_id = "mug_link";
 
 	tf_broadcaster_->sendTransform(msg_);
+}
+
+void Mug::mug_fall()
+{
+	if(msg_.transform.translation.z <= 0)
+	{
+		msg_.transform.translation.z = 0;
+	} else 
+	{
+		msg_.transform.translation.z -= 0.1;
+	}
+
 }
 
 double Mug::calculate_distance(const geometry_msgs::msg::Vector3& p1, const geometry_msgs::msg::Vector3& p2) const
