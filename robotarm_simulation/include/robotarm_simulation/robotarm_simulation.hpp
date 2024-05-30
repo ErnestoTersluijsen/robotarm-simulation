@@ -27,12 +27,12 @@ class RobotarmSimulation : public rclcpp::Node
 
 	sensor_msgs::msg::JointState msg_;
 
-	std::vector<double> positions = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-	std::vector<double> steps = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	std::vector<double> positions_ = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+	std::vector<double> steps_ = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 
-	unsigned long min_moving_time;
+	unsigned long min_moving_time_;
 
-	unsigned long update_interval;
+	unsigned long update_interval_;
 };
 
 #endif // ROBOTARM_SIMULATION_ROBOTARM_SIMULATION_HPP

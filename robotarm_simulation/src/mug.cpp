@@ -2,9 +2,9 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-Mug::Mug() : Node("mug"), update_interval(10), current_velocity(0), mug_height_offset(0.02)
+Mug::Mug() : Node("mug"), update_interval_(10), current_velocity_(0), mug_height_offset_(0.02)
 {
-	timer_ = this->create_wall_timer(std::chrono::milliseconds(update_interval), std::bind(&Mug::update_mug, this));
+	timer_ = this->create_wall_timer(std::chrono::milliseconds(update_interval_), std::bind(&Mug::update_mug, this));
 
 	tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
@@ -14,7 +14,7 @@ Mug::Mug() : Node("mug"), update_interval(10), current_velocity(0), mug_height_o
 	msg_.transform.translation.x = this->declare_parameter<double>("x", 0.35);
 	msg_.transform.translation.y = this->declare_parameter<double>("y", 0);
 	msg_.transform.translation.z = this->declare_parameter<double>("z", 0);
-	
+
 	previous_hand_.transform.translation.x = 0;
 	previous_hand_.transform.translation.y = 0;
 	previous_hand_.transform.translation.z = 0;
@@ -44,23 +44,28 @@ void Mug::update_mug()
 
 	if (left_gripper_distance <= gripper_to_mug_grab_distance && right_gripper_distance <= gripper_to_mug_grab_distance)
 	{
-		current_velocity = 0;
+		current_velocity_ = 0;
 
 		msg_.transform.translation.x += (hand.transform.translation.x - previous_hand_.transform.translation.x);
 		msg_.transform.translation.y += (hand.transform.translation.y - previous_hand_.transform.translation.y);
 		msg_.transform.translation.z += (hand.transform.translation.z - previous_hand_.transform.translation.z);
 	}
-	else if (msg_.transform.translation.z != mug_height_offset)
+	else if (msg_.transform.translation.z != mug_height_offset_)
 	{
 		update_gravity();
 	}
 	else
 	{
-		current_velocity = 0;
+		current_velocity_ = 0;
 	}
 	previous_hand_.transform.translation.x = hand.transform.translation.x;
 	previous_hand_.transform.translation.y = hand.transform.translation.y;
 	previous_hand_.transform.translation.z = hand.transform.translation.z;
+
+	RCLCPP_INFO_STREAM(this->get_logger(), "x mug: " << msg_.transform.translation.x);
+	RCLCPP_INFO_STREAM(this->get_logger(), "y mug: " << msg_.transform.translation.y);
+	RCLCPP_INFO_STREAM(this->get_logger(), "z mug: " << msg_.transform.translation.z);
+	RCLCPP_INFO_STREAM(this->get_logger(), "====================");
 
 	msg_.header.stamp = get_clock()->now();
 	msg_.header.frame_id = "base_link";
@@ -72,14 +77,14 @@ void Mug::update_mug()
 void Mug::update_gravity()
 {
 	const double gravitational_acceleration = 9.81;
-	const double time = static_cast<double>(update_interval) / 1000;
+	const double time = static_cast<double>(update_interval_) / 1000;
 
-	current_velocity -= gravitational_acceleration * time;
-	msg_.transform.translation.z += current_velocity * time;
+	current_velocity_ -= gravitational_acceleration * time;
+	msg_.transform.translation.z += current_velocity_ * time;
 
-	if (msg_.transform.translation.z < mug_height_offset)
+	if (msg_.transform.translation.z < mug_height_offset_)
 	{
-		msg_.transform.translation.z = mug_height_offset;
+		msg_.transform.translation.z = mug_height_offset_;
 	}
 }
 

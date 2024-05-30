@@ -6,13 +6,13 @@
 #include <regex>
 #include <string>
 
-RobotarmSimulation::RobotarmSimulation() : Node("robotarm_simulation"), min_moving_time(1000), update_interval(10)
+RobotarmSimulation::RobotarmSimulation() : Node("robotarm_simulation"), min_moving_time_(1000), update_interval_(10)
 {
 	subscription_ = this->create_subscription<std_msgs::msg::String>("commands", 10, std::bind(&RobotarmSimulation::parse_command, this, std::placeholders::_1));
 
 	publisher_ = this->create_publisher<sensor_msgs::msg::JointState>("joint_states", 10);
 
-	timer_ = this->create_wall_timer(std::chrono::milliseconds(update_interval), std::bind(&RobotarmSimulation::update_robotarm, this));
+	timer_ = this->create_wall_timer(std::chrono::milliseconds(update_interval_), std::bind(&RobotarmSimulation::update_robotarm, this));
 
 	msg_.header.stamp = get_clock()->now();
 	msg_.name = { "base_link2turret", "turret2upperarm", "upperarm2forearm", "forearm2wrist", "wrist2hand", "gripper_left2hand", "gripper_right2hand" };
@@ -34,22 +34,22 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 			unsigned long servo_id = std::stoul(matches.str(1));
 			unsigned long pwm = std::stoul(matches.str(2));
 			unsigned long time = std::stoul(matches.str(3));
-			time = std::max(time, min_moving_time);
+			time = std::max(time, min_moving_time_);
 
 			pwm = std::min(pwm, MAX_PWM);
 			pwm = std::max(pwm, MIN_PWM);
 
 			if (servo_id < 5)
 			{
-				positions.at(servo_id) = pwm_to_radians(pwm);
-				steps.at(servo_id) = (positions.at(servo_id) - msg_.position.at(servo_id)) / (time / 10);
+				positions_.at(servo_id) = pwm_to_radians(pwm);
+				steps_.at(servo_id) = (positions_.at(servo_id) - msg_.position.at(servo_id)) / (time / 10);
 			}
 			else if (std::stoul(matches.str(1)) == 5)
 			{
 				for (int i = 0; i < 2; ++i)
 				{
-					positions.at(servo_id + i) = pwm_to_meters(pwm);
-					steps.at(servo_id + i) = (positions.at(servo_id + i) - msg_.position.at(servo_id + i)) / (time / 10);
+					positions_.at(servo_id + i) = pwm_to_meters(pwm);
+					steps_.at(servo_id + i) = (positions_.at(servo_id + i) - msg_.position.at(servo_id + i)) / (time / 10);
 				}
 			}
 		}
@@ -63,11 +63,11 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 
 void RobotarmSimulation::update_robotarm()
 {
-	for (unsigned long i = 0; i < positions.size(); ++i)
+	for (unsigned long i = 0; i < positions_.size(); ++i)
 	{
-		if (std::abs(msg_.position.at(i) - positions.at(i)) > std::numeric_limits<float>::epsilon())
+		if (std::abs(msg_.position.at(i) - positions_.at(i)) > std::numeric_limits<float>::epsilon())
 		{
-			msg_.position.at(i) += steps.at(i);
+			msg_.position.at(i) += steps_.at(i);
 		}
 	}
 

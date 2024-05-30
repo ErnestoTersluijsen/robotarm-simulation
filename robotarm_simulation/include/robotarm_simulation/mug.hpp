@@ -32,11 +32,11 @@ class Mug : public rclcpp::Node
 
 	geometry_msgs::msg::TransformStamped previous_hand_;
 
-	unsigned long update_interval;
+	unsigned long update_interval_;
 
-	double current_velocity;
+	double current_velocity_;
 
-	double mug_height_offset;
+	double mug_height_offset_;
 };
 
 #endif // ROBOTARM_SIMULATION_MUG_HPP
