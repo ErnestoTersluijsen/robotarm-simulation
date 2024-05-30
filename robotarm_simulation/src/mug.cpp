@@ -2,7 +2,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-Mug::Mug() : Node("mug"), update_interval(10), current_velocity(0)
+Mug::Mug() : Node("mug"), update_interval(10), current_velocity(0), mug_height_offset(0.02)
 {
 	timer_ = this->create_wall_timer(std::chrono::milliseconds(update_interval), std::bind(&Mug::update_mug, this));
 
@@ -14,6 +14,7 @@ Mug::Mug() : Node("mug"), update_interval(10), current_velocity(0)
 	msg_.transform.translation.x = this->declare_parameter<double>("x", 0.35);
 	msg_.transform.translation.y = this->declare_parameter<double>("y", 0);
 	msg_.transform.translation.z = this->declare_parameter<double>("z", 0);
+	
 	previous_hand_.transform.translation.x = 0;
 	previous_hand_.transform.translation.y = 0;
 	previous_hand_.transform.translation.z = 0;
@@ -39,32 +40,17 @@ void Mug::update_mug()
 	double left_gripper_distance = calculate_distance(msg_.transform.translation, gripper_left.transform.translation);
 	double right_gripper_distance = calculate_distance(msg_.transform.translation, gripper_right.transform.translation);
 
-	// TODO: DELETE LATER
-	RCLCPP_INFO_STREAM(this->get_logger(), "left gripper distance: " << left_gripper_distance);
-	RCLCPP_INFO_STREAM(this->get_logger(), "right gripper distance: " << right_gripper_distance);
-	RCLCPP_INFO_STREAM(this->get_logger(), "x hand: " << previous_hand_.transform.translation.x);
-	RCLCPP_INFO_STREAM(this->get_logger(), "y hand: " << previous_hand_.transform.translation.y);
-	RCLCPP_INFO_STREAM(this->get_logger(), "z hand: " << previous_hand_.transform.translation.z);
-	RCLCPP_INFO_STREAM(this->get_logger(), "x mug: " << msg_.transform.translation.x);
-	RCLCPP_INFO_STREAM(this->get_logger(), "y mug: " << msg_.transform.translation.y);
-	RCLCPP_INFO_STREAM(this->get_logger(), "z mug: " << msg_.transform.translation.z);
-	RCLCPP_INFO_STREAM(this->get_logger(), "x mugMove: " << (hand.transform.translation.x - previous_hand_.transform.translation.x));
-	RCLCPP_INFO_STREAM(this->get_logger(), "y mugMove: " << (hand.transform.translation.y - previous_hand_.transform.translation.y));
-	RCLCPP_INFO_STREAM(this->get_logger(), "z mugMove: " << (hand.transform.translation.z - previous_hand_.transform.translation.z));
+	const double gripper_to_mug_grab_distance = 0.04;
 
-	if (left_gripper_distance <= 0.03 && right_gripper_distance <= 0.03) // TODO: CHANGE THESE VALUES ~0.03 or lower
+	if (left_gripper_distance <= gripper_to_mug_grab_distance && right_gripper_distance <= gripper_to_mug_grab_distance)
 	{
 		current_velocity = 0;
-		std::cout << "in the gripper" << std::endl;
-		// msg_.transform.translation;
-		// msg_.transform.translation.z = 3;
-		// TODO: SAVE PREVIOUS HAND POS
-		// TODO: ADD (CURRENT_HAND_POS - PREV_HAND_POS) TO MUG TO DO MOVEMENT
+
 		msg_.transform.translation.x += (hand.transform.translation.x - previous_hand_.transform.translation.x);
 		msg_.transform.translation.y += (hand.transform.translation.y - previous_hand_.transform.translation.y);
 		msg_.transform.translation.z += (hand.transform.translation.z - previous_hand_.transform.translation.z);
 	}
-	else if (msg_.transform.translation.z != 0)
+	else if (msg_.transform.translation.z != mug_height_offset)
 	{
 		update_gravity();
 	}
@@ -91,9 +77,9 @@ void Mug::update_gravity()
 	current_velocity -= gravitational_acceleration * time;
 	msg_.transform.translation.z += current_velocity * time;
 
-	if (msg_.transform.translation.z < 0)
+	if (msg_.transform.translation.z < mug_height_offset)
 	{
-		msg_.transform.translation.z = 0;
+		msg_.transform.translation.z = mug_height_offset;
 	}
 }
 

@@ -35,6 +35,8 @@ class Mug : public rclcpp::Node
 	unsigned long update_interval;
 
 	double current_velocity;
+
+	double mug_height_offset;
 };
 
 #endif // ROBOTARM_SIMULATION_MUG_HPP
