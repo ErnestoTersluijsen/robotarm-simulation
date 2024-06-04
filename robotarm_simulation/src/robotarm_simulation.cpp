@@ -15,19 +15,21 @@ RobotarmSimulation::RobotarmSimulation() : Node("robotarm_simulation"), min_movi
 	timer_ = this->create_wall_timer(std::chrono::milliseconds(update_interval_), std::bind(&RobotarmSimulation::update_robotarm, this));
 
 	msg_.header.stamp = get_clock()->now();
-	msg_.name = { "base_link2turret", "turret2upperarm", "upperarm2forearm", "forearm2wrist", "wrist2hand", "gripper_left2hand", "gripper_right2hand" };
+	msg_.name = {"base_link2turret", "turret2upperarm", "upperarm2forearm", "forearm2wrist", "wrist2hand", "gripper_left2hand", "gripper_right2hand"};
 	msg_.position = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 }
 
 void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 {
 	std::regex regex_patern("#(\\d+)P(\\d+)T(\\d+)\r");
+	std::regex regex_stop_patern("STOP (\\d)\r");
 	std::smatch matches;
 
-	if (std::regex_search(command.data, matches, regex_patern))
+	try
 	{
-		try
+		if (std::regex_search(command.data, matches, regex_patern))
 		{
+
 			const unsigned long MAX_PWM = 2500;
 			const unsigned long MIN_PWM = 500;
 
@@ -53,11 +55,18 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 				}
 			}
 		}
-		catch (const std::exception& e)
+		else if (std::regex_search(command.data, matches, regex_stop_patern))
 		{
-			std::cerr << e.what() << std::endl;
-			std::cerr << "Error with parsing the command." << std::endl;
+			unsigned long servo_id = std::stoul(matches.str(1));
+			
+			positions_.at(servo_id) = msg_.position.at(servo_id);
+			steps_.at(servo_id) = 0.0;
 		}
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		std::cerr << "Error with parsing the command." << std::endl;
 	}
 }
 
