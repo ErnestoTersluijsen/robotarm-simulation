@@ -42,14 +42,14 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 			if (servo_id < 5)
 			{
 				positions_.at(servo_id) = pwm_to_radians(pwm);
-				steps_.at(servo_id) = (positions_.at(servo_id) - msg_.position.at(servo_id)) / (time / 10);
+				steps_.at(servo_id) = (positions_.at(servo_id) - msg_.position.at(servo_id)) / (static_cast<double>(time) / 10);
 			}
 			else if (std::stoul(matches.str(1)) == 5)
 			{
 				for (int i = 0; i < 2; ++i)
 				{
 					positions_.at(servo_id + i) = pwm_to_meters(pwm);
-					steps_.at(servo_id + i) = (positions_.at(servo_id + i) - msg_.position.at(servo_id + i)) / (time / 10);
+					steps_.at(servo_id + i) = (positions_.at(servo_id + i) - msg_.position.at(servo_id + i)) / (static_cast<double>(time) / 10);
 				}
 			}
 		}
@@ -84,7 +84,7 @@ double RobotarmSimulation::pwm_to_radians(long pwm)
 	constexpr double min_pwm = 500;
 	constexpr double max_pwm = 2500;
 
-	return (pwm - min_pwm) * (radians_max - radians_min) / (max_pwm - min_pwm) + radians_min;
+	return (static_cast<double>(pwm) - min_pwm) * (radians_max - radians_min) / (max_pwm - min_pwm) + radians_min;
 }
 
 double RobotarmSimulation::pwm_to_meters(long pwm)
@@ -94,5 +94,5 @@ double RobotarmSimulation::pwm_to_meters(long pwm)
 	constexpr double min_pwm = 500;
 	constexpr double max_pwm = 2500;
 
-	return (pwm - min_pwm) * (meters_max - meters_min) / (max_pwm - min_pwm) + meters_min;
+	return (static_cast<double>(pwm) - min_pwm) * (meters_max - meters_min) / (max_pwm - min_pwm) + meters_min;
 }
