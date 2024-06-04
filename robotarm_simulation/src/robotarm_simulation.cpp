@@ -58,7 +58,7 @@ void RobotarmSimulation::parse_command(const std_msgs::msg::String& command)
 		else if (std::regex_search(command.data, matches, regex_stop_patern))
 		{
 			unsigned long servo_id = std::stoul(matches.str(1));
-			
+
 			positions_.at(servo_id) = msg_.position.at(servo_id);
 			steps_.at(servo_id) = 0.0;
 		}
